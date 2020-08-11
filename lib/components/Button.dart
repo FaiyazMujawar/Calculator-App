@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 class Button extends StatefulWidget {
   final text;
   final icon;
+  final color;
+  final action;
 
-  const Button({Key key, this.text, this.icon}) : super(key: key);
+  const Button({Key key, this.text, this.icon, this.action, this.color})
+      : super(key: key);
   @override
   ButtonState createState() => ButtonState();
 }
@@ -13,10 +16,13 @@ class ButtonState extends State<Button> {
   String text;
   Color color;
   Icon icon;
+  Function action;
   @override
   void initState() {
     text = widget.text;
     icon = widget.icon;
+    color = widget.color;
+    action = widget.action;
     super.initState();
   }
 
@@ -26,20 +32,18 @@ class ButtonState extends State<Button> {
       child: Container(
         margin: EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
           border: Border.all(
             color: Colors.grey.shade200,
             width: 1.0,
           ),
         ),
         child: Material(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
+          color: color ?? Colors.white38,
           child: InkWell(
-            onTap: () {
-              print(text);
-            },
-            borderRadius: BorderRadius.circular(10),
+            onTap: action,
+            borderRadius: BorderRadius.circular(15),
             child: Center(
                 child: icon == null
                     ? Text(
