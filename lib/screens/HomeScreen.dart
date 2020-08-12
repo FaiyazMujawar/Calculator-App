@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:calc/components/Button.dart';
 import 'package:calc/services/Calculator.dart';
 import 'package:calc/themes.dart';
@@ -12,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String input;
   String output;
+  String exp;
   Calculator calculator;
   @override
   void initState() {
@@ -28,6 +31,15 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Column(
           children: [
             Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                border: Border(
+                  bottom: BorderSide(
+                    width: 1,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+              ),
               height: MediaQuery.of(context).size.height * 0.35,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -66,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: Container(
                 padding: EdgeInsets.all(5),
-                color: Colors.grey.shade100,
+                color: kSecondaryColor,
                 child: Row(
                   children: [
                     Expanded(
@@ -78,11 +90,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Button(
                                   icon: Icon(
-                                    MdiIcons.deleteOutline,
+                                    Icons.backspace,
                                     color: Colors.white,
                                   ),
                                   color: kPrimaryColor,
-                                  action: () {
+                                  action: backSpace(),
+                                  lonPressAction: () {
                                     setState(() {
                                       input = "";
                                       output = "";
@@ -90,34 +103,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                   },
                                 ),
                                 Button(
-                                  icon: Icon(
-                                    Icons.backspace,
+                                  text: "(",
+                                  textStyle: TextStyle(
                                     color: kPrimaryColor,
-                                    size: 20,
+                                    fontSize: 20,
                                   ),
-                                  action: () {
-                                    setState(() {
-                                      if (input.length > 0) {
-                                        input = input.substring(
-                                            0, input.length - 1);
-                                      }
-                                    });
-                                  },
+                                  action: setText("("),
                                 ),
                                 Button(
-                                  icon: Icon(
-                                    MdiIcons.percentOutline,
+                                  text: ")",
+                                  textStyle: TextStyle(
                                     color: kPrimaryColor,
-                                    size: 20,
+                                    fontSize: 20,
                                   ),
-                                  action: setText("%"),
+                                  action: setText(")"),
                                 ),
                                 Button(
                                   icon: Icon(
                                     MdiIcons.division,
                                     color: kPrimaryColor,
-                                    size: 20,
+                                    size: 25,
                                   ),
+                                  // color: Color(0xffe5e5e5),
                                   action: setText("÷"),
                                 ),
                               ],
@@ -142,8 +149,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   icon: Icon(
                                     Icons.clear,
                                     color: kPrimaryColor,
-                                    size: 20,
+                                    size: 25,
                                   ),
+                                  // color: Color(0xffe5e5e5),
                                   action: setText("x"),
                                 ),
                               ],
@@ -168,8 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   icon: Icon(
                                     MdiIcons.plus,
                                     color: kPrimaryColor,
-                                    size: 20,
+                                    size: 25,
                                   ),
+                                  // color: Color(0xffe5e5e5),
                                   action: setText("+"),
                                 ),
                               ],
@@ -194,8 +203,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   icon: Icon(
                                     MdiIcons.minus,
                                     color: kPrimaryColor,
-                                    size: 20,
+                                    size: 25,
                                   ),
+                                  // color: Color(0xffe5e5e5),
                                   action: setText("−"),
                                 ),
                               ],
@@ -209,6 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     MdiIcons.swapHorizontal,
                                     color: kPrimaryColor,
                                   ),
+                                  action: getBottomSheet(),
                                 ),
                                 Button(
                                   text: "0",
@@ -223,9 +234,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const EdgeInsets.only(top: 5, bottom: 5),
                                   child: RawMaterialButton(
                                     onPressed: () {
+                                      exp = input;
+                                      exp =
+                                          exp.replaceAll(new RegExp(r'x'), '*');
+                                      exp =
+                                          exp.replaceAll(new RegExp(r'÷'), '/');
+                                      exp = exp.replaceAll(
+                                          new RegExp(r'e'), e.toString());
+                                      exp = exp.replaceAll(
+                                          new RegExp(r'π'), pi.toString());
                                       setState(() {
                                         String result =
-                                            calculator.solveExp(input);
+                                            calculator.calculate(exp);
                                         output = result == null
                                             ? "ERROR"
                                             : "= " + result;
@@ -238,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       size: 23,
                                       color: Colors.white,
                                     ),
-                                    padding: EdgeInsets.all(20.0),
+                                    padding: EdgeInsets.all(25.0),
                                     shape: CircleBorder(),
                                   ),
                                 ),
@@ -251,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -262,5 +282,158 @@ class _HomeScreenState extends State<HomeScreen> {
     return () => setState(() {
           input += text;
         });
+  }
+
+  Function backSpace() {
+    return () => setState(() {
+          String lastTerm;
+          if (input.length > 3) {
+            lastTerm = input.substring(input.length - 4, input.length);
+            if (lastTerm == "sin(" ||
+                lastTerm == "cos(" ||
+                lastTerm == "tan(" ||
+                lastTerm == "log(" ||
+                lastTerm == "inv(")
+              input = input.substring(0, input.length - 3);
+          }
+          if (input.length > 4 && lastTerm == "qrt(")
+            input = input.substring(0, input.length - 4);
+          else if (input.endsWith("ln("))
+            input = input.substring(0, input.length - 2);
+          else if (input.length != 0)
+            input = input.substring(0, input.length - 1);
+        });
+  }
+
+  Function getBottomSheet() {
+    return () => showModalBottomSheet(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10.0))),
+          backgroundColor: kPrimaryColor,
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(15, 15, 15, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.4,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Button(
+                                text: "sin",
+                                color: Colors.transparent,
+                                action: setText("sin("),
+                              ),
+                              Button(
+                                text: "cos",
+                                color: Colors.transparent,
+                                action: setText("cos("),
+                              ),
+                              Button(
+                                text: "tan",
+                                color: Colors.transparent,
+                                action: setText("tan("),
+                              ),
+                              Button(
+                                text: "log",
+                                color: Colors.transparent,
+                                action: setText("log("),
+                              ),
+                              Button(
+                                text: "ln",
+                                color: Colors.transparent,
+                                action: setText("ln("),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Button(
+                                icon: Icon(
+                                  MdiIcons.percentOutline,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                color: Colors.transparent,
+                                action: setText("%"),
+                              ),
+                              Button(
+                                text: "e",
+                                color: Colors.transparent,
+                                action: setText("e"),
+                              ),
+                              Button(
+                                text: "X!",
+                                color: Colors.transparent,
+                                action: setText("!"),
+                              ),
+                              Button(
+                                icon: Icon(
+                                  MdiIcons.exponent,
+                                  color: Colors.white,
+                                ),
+                                color: Colors.transparent,
+                                action: setText("^"),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Button(
+                                text: "",
+                                icon: Icon(
+                                  MdiIcons.pi,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                color: Colors.transparent,
+                                action: setText("π"),
+                              ),
+                              Button(
+                                text: "",
+                                icon: Icon(
+                                  MdiIcons.squareRoot,
+                                  size: 25,
+                                  color: Colors.white,
+                                ),
+                                color: Colors.transparent,
+                                action: setText("sqrt("),
+                              ),
+                              Button(
+                                text: "1/x",
+                                color: Colors.transparent,
+                                action: setText("inv("),
+                              ),
+                              Button(
+                                text: "",
+                                color: Colors.transparent,
+                              ),
+                              Button(
+                                text: "",
+                                color: Colors.transparent,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
   }
 }

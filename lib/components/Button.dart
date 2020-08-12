@@ -4,9 +4,18 @@ class Button extends StatefulWidget {
   final text;
   final icon;
   final color;
+  final textStyle;
   final action;
+  final lonPressAction;
 
-  const Button({Key key, this.text, this.icon, this.action, this.color})
+  const Button(
+      {Key key,
+      this.text,
+      this.icon,
+      this.action,
+      this.color,
+      this.textStyle,
+      this.lonPressAction})
       : super(key: key);
   @override
   ButtonState createState() => ButtonState();
@@ -16,13 +25,17 @@ class ButtonState extends State<Button> {
   String text;
   Color color;
   Icon icon;
+  TextStyle textStyle;
   Function action;
+  Function lonPressAction;
   @override
   void initState() {
     text = widget.text;
     icon = widget.icon;
     color = widget.color;
+    textStyle = widget.textStyle;
     action = widget.action;
+    lonPressAction = widget.lonPressAction;
     super.initState();
   }
 
@@ -34,8 +47,8 @@ class ButtonState extends State<Button> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: Colors.grey.shade200,
             width: 1.0,
+            color: color == Colors.transparent ? color : Colors.grey.shade300,
           ),
         ),
         child: Material(
@@ -43,14 +56,19 @@ class ButtonState extends State<Button> {
           color: color ?? Colors.white38,
           child: InkWell(
             onTap: action,
+            onLongPress: lonPressAction,
             borderRadius: BorderRadius.circular(15),
             child: Center(
                 child: icon == null
                     ? Text(
                         text,
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
+                        style: textStyle == null
+                            ? TextStyle(
+                                fontSize: 20,
+                                color: color == Colors.transparent
+                                    ? Colors.white
+                                    : Colors.black)
+                            : textStyle,
                       )
                     : icon),
           ),
