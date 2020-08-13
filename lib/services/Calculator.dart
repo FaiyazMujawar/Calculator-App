@@ -1,168 +1,177 @@
 import 'dart:math';
 
 class Calculator {
-  RegExp mathExp;
-  RegExp math;
+  RegExp _validExp;
+  RegExp _math;
+  RegExp _power;
 
   Calculator() {
-    /*
-      RegEx to check if mathematical expression is valid. Basic only, 
-      without brackets.
-    */
-    mathExp = new RegExp(
-      /* r"^([0-9]+\%?\!?|[0-9]+\!?[\+\*-/^][0-9]+\%?\!?)([\+\*-/^][0-9]+\%?\!?)*$", */
-      r"^(\(?[0-9]+\)?\!?\%?\)?|\(?[0-9]+?\!?\)?[\+\*-/^]\(?[0-9]+?\!?\%?\)?)([\+\*-/^]\(?[0-9]+\)?\!?\%?\)?)*$",
+    _validExp = new RegExp(
+      r"^(\(*[0-9]+\!?\%?\)*|\(*[0-9]+\!?\%?\)*[\+\*-/^][0-9]+\!?\%?)([\+\*-/^]\(*[0-9]+\!?\%?\)*)*$",
     );
-
-    math = new RegExp(r"(sin|cos|tan|log|ln|sqrt|inv)\(.+\)");
+    _math = new RegExp(r"(sin|cos|tan|log|ln|inv|sqrt)\(.+\)");
+    _power = new RegExp(r"\d+\^\d+");
   }
 
-  double _solveExp(String exp) {
-    int length = exp.length;
-    int decimal = 1;
-    bool isDecimal = false;
+  bool _isNumeric(String number) {
+    return number != null && double.parse(number, (e) => null) != null;
+  }
+
+  double _factorial(double num) {
+    double result = 1;
+    for (var i = 2; i <= num; i++) result *= i;
+    return result;
+  }
+
+  String _solvePower(String exp) {
+    Iterable<RegExpMatch> matches = _power.allMatches(exp);
+    String expr;
+    double num1, num2;
+    Iterable<RegExpMatch> numMatches;
+    RegExp numbers = new RegExp(r"\d+");
+    matches.forEach((match) {
+      expr = exp.substring(match.start, match.end);
+      numMatches = numbers.allMatches(expr);
+      num1 = double.parse(expr.substring(
+          numMatches.elementAt(0).start, numMatches.elementAt(0).end));
+      num2 = double.parse(expr.substring(
+          numMatches.elementAt(1).start, numMatches.elementAt(1).end));
+      num1 = pow(num1, num2);
+      exp = exp.replaceFirst(expr, num1.toString());
+    });
+    return exp;
+  }
+
+  double _evaluate(List<String> exp) {
     List<double> operands = [];
+    bool isDecimal = false;
+    int decimal = 1;
+    double result = 0.0;
+    double number = 0.0;
     double temp;
-    double result = 0;
-    double number = 0;
     String sign = "+";
-    String num = "";
-    for (int i = 0; i < length; i++) {
-      num = exp[i];
-      if (num == " ") continue;
-      exp = exp.replaceFirst(num, " ");
-      if (_isNumeric(num)) {
-        temp = double.parse(num);
+    String char;
+
+    while (exp.length > 0) {
+      char = exp.elementAt(0);
+      if (char == '.') {
+        isDecimal = true;
+        decimal = 10;
+        exp.removeAt(0);
+        continue;
+      } else if (char == '(') {
+        exp.removeAt(0);
+        number = _evaluate(exp);
+      } else if (char == '!') {
+        number = _factorial(number);
+      } else if (char == '%') {
+        if (operands.length > 0) {
+          temp = operands.last;
+          number = number * (temp / 100);
+        } else
+          number /= 100;
+      } else if (_isNumeric(char)) {
+        temp = double.parse(char);
         if (isDecimal) {
-          temp = temp / decimal;
+          temp /= decimal;
           decimal *= 10;
           number += temp;
         } else
           number = number * 10 + temp;
       }
-      if (num == ".") {
-        decimal = 10;
-        isDecimal = true;
-        continue;
-      }
-      if (num == "!") {
-        number = _factorial(number);
-      }
-
-      if (!_isNumeric(num) || i == length - 1) {
-        if (sign == "+")
+      if (!_isNumeric(char) || exp.length == 1) {
+        if (sign == '+') {
           operands.add(number);
-        else if (sign == "-")
+        } else if (sign == '-') {
           operands.add(-number);
-        else if (sign == "*") {
-          double n = operands.last;
+        } else if (sign == '*') {
+          double temp = operands.last;
           operands.removeLast();
-          operands.add(n * number);
-        } else if (sign == "/") {
-          double n = operands.last;
+          operands.add(temp * number);
+        } else if (sign == '/') {
+          double temp = operands.last;
           operands.removeLast();
-          operands.add(n / number);
-        } else if (sign == "%") {
-          print(number);
-          operands.add(number / 100);
-        } else if (sign == "^") {
-          double n = operands.last;
-          operands.removeLast();
-          operands.add(pow(n, number));
+          operands.add(temp / number);
         }
         number = 0;
-        sign = num;
         isDecimal = false;
         decimal = 1;
+        sign = char;
       }
+      if (char == ')') break;
+      if (exp.length > 0) exp.removeAt(0);
     }
-    for (var i = 0; i < operands.length; i++) {
-      result += operands[i];
+
+    for (var number in operands) {
+      result += number;
     }
     return result;
   }
 
-  double _evaluate(String exp) {
-    exp = _solveMath(exp);
-    if (!mathExp.hasMatch(exp)) return null;
-    return _solveExp(exp);
-  }
-
-  String calculate(String exp) {
-    double result = _evaluate(exp);
-    if (result == null) return null;
-    String res = result.toStringAsFixed(4);
-    res = res.replaceAll(new RegExp(r'\.0+$'), "");
-    return res;
-  }
-
   String _solveMath(String exp) {
-    String subExp;
     String expr;
+    String subExp;
     double partResult;
-    Iterable<RegExpMatch> matches = math.allMatches(exp);
-    matches.forEach(
-      (match) {
-        expr = exp.substring(match.start, match.end);
-        switch (exp.substring(match.start, match.start + 2)) {
-          // Evaluating "sin"
-          case "si":
-            subExp = exp.substring(match.start + 4, match.end - 1);
-            partResult = _evaluate(subExp);
-            print(partResult);
-            partResult = sin((partResult * pi) / 180);
-            print(partResult);
-            break;
-          // Evaluating "cos"
-          case "co":
-            subExp = exp.substring(match.start + 4, match.end - 1);
-            partResult = _evaluate(subExp);
-            partResult = cos((partResult * pi) / 180);
-            break;
-          // Evaluating "tan"
-          case "ta":
-            subExp = exp.substring(match.start + 4, match.end - 1);
-            partResult = _evaluate(subExp);
-            partResult = tan((partResult * pi) / 180);
-            break;
-          // Evaluating "log"
-          case "lo":
-            subExp = exp.substring(match.start + 4, match.end - 1);
-            partResult = _evaluate(subExp);
-            partResult = log(partResult) * log10e;
-            break;
-          // Evaluating "ln"
-          case "ln":
-            subExp = exp.substring(match.start + 3, match.end - 1);
-            partResult = _evaluate(subExp);
-            partResult = log(partResult);
-            break;
-          // Evaluating "sqrt"
-          case "sq":
-            subExp = exp.substring(match.start + 5, match.end - 1);
-            partResult = _evaluate(subExp);
-            partResult = sqrt(partResult);
-            break;
-          // Evaluating "inv"
-          case "in":
-            subExp = exp.substring(match.start + 4, match.end - 1);
-            partResult = _evaluate(subExp);
-            partResult = 1 / partResult;
-            break;
-        }
-        exp = exp.replaceAll(expr, partResult.toString());
-      },
-    );
+    Iterable<RegExpMatch> matches = _math.allMatches(exp);
+    if (matches.length == 0) return exp;
+    matches.forEach((match) {
+      expr = exp.substring(match.start, match.end);
+      switch (expr.substring(0, 2)) {
+        case "si":
+          subExp = expr.substring(4, expr.length - 1);
+          partResult = _solveExp(subExp);
+          partResult = sin(partResult * (pi / 180));
+          break;
+        case "co":
+          subExp = expr.substring(4, expr.length - 1);
+          partResult = _solveExp(subExp);
+          partResult = cos(partResult * (pi / 180));
+          break;
+        case "ta":
+          subExp = expr.substring(4, expr.length - 1);
+          partResult = _solveExp(subExp);
+          partResult = tan(partResult * (pi / 180));
+          break;
+        case "lo":
+          subExp = expr.substring(4, expr.length - 1);
+          partResult = _solveExp(subExp);
+          partResult = log(partResult) * log10e;
+          break;
+        case "ln":
+          subExp = expr.substring(3, expr.length - 1);
+          partResult = _solveExp(subExp);
+          partResult = log(partResult);
+          break;
+        case "in":
+          subExp = expr.substring(4, expr.length - 1);
+          partResult = _solveExp(subExp);
+          partResult = 1 / partResult;
+          break;
+        case "sq":
+          subExp = expr.substring(5, expr.length - 1);
+          partResult = _solveExp(subExp);
+          partResult = sqrt(partResult);
+          break;
+      }
+      exp = exp.replaceFirst(expr, partResult.toString());
+    });
     return exp;
   }
-}
 
-bool _isNumeric(String num) {
-  return num == null ? false : double.parse(num, (e) => null) != null;
-}
+  double _solveExp(String exp) {
+    exp = _solveMath(exp);
+    exp = _solvePower(exp);
+    if (!_validExp.hasMatch(exp)) return null;
+    return _evaluate(exp.split(""));
+  }
 
-double _factorial(double num) {
-  double result = 1;
-  for (var i = 1; i <= num; i++) result *= i;
-  return result;
+  String solve(String exp) {
+    exp = exp.replaceAll(new RegExp(r'x'), '*');
+    exp = exp.replaceAll(new RegExp(r'÷'), '/');
+    exp = exp.replaceAll(new RegExp(r'e'), e.toString());
+    exp = exp.replaceAll(new RegExp(r'π'), pi.toString());
+    double result = _solveExp(exp);
+    if (result == null) return null;
+    return result.toStringAsPrecision(5);
+  }
 }

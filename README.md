@@ -1,16 +1,20 @@
-# calc
+# Calculator
 
-A new Flutter project.
+A calculator app made using Flutter.
 
-## Getting Started
+The app can perform following operations:
+- Trigonometric Functions (sin/cos/tan).
+- Mathematical operations(+, -, x, ÷, root, inverse).
+- Logarithms(log/ln)
 
-This project is a starting point for a Flutter application.
+Screenshots:
 
-A few resources to get you started if this is your first Flutter project:
+Main Screen:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+<img src="images/main_screen.jpg" width="200">
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+Advanced options:
+
+<img src="images/adv_screen.jpg" width="200">
