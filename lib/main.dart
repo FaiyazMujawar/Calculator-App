@@ -1,3 +1,4 @@
+import 'package:calc/screens/HomeScreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,6 +13,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return MaterialApp(
+      theme: ThemeData(fontFamily: 'Rubik'),
+      home: HomeScreen(),
+    );
   }
 }
