@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:calc/components/Button.dart';
 import 'package:calc/services/Calculator.dart';
 import 'package:calc/themes.dart';
@@ -14,12 +12,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String input;
   String output;
+  String result;
   String exp;
   Calculator calculator;
   @override
   void initState() {
     input = "";
     output = "";
+    result = "";
     calculator = new Calculator();
     super.initState();
   }
@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: Color(0xFFf8f9fa),
                 border: Border(
                   bottom: BorderSide(
                     width: 1,
@@ -54,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       hintText: input,
                       hintStyle: TextStyle(
                         fontSize: 25,
+                        fontFamily: 'Rubik',
                         color: Colors.black,
                       ),
                     ),
@@ -108,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: kPrimaryColor,
                                     fontSize: 20,
                                   ),
+                                  color: Color(0xFFe9ecef),
                                   action: setText("("),
                                 ),
                                 Button(
@@ -116,7 +118,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: kPrimaryColor,
                                     fontSize: 20,
                                   ),
-                                  action: setText(")"),
+                                  color: Color(0xFFe9ecef),
+                                  action: () {
+                                    setState(() {
+                                      input += ")";
+                                      result =
+                                          calculator.solve(input) ?? result;
+                                      output = "= " + result;
+                                    });
+                                  },
                                 ),
                                 Button(
                                   icon: Icon(
@@ -124,53 +134,90 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: kPrimaryColor,
                                     size: 25,
                                   ),
-                                  // color: Color(0xffe5e5e5),
+                                  color: Color(0xFFe9ecef),
                                   action: setText("÷"),
                                 ),
                               ],
                             ),
                           ),
                           Expanded(
-                            child: Row(
-                              children: [
-                                Button(
-                                  text: "7",
-                                  action: setText("7"),
+                            child: Row(children: [
+                              Button(
+                                text: "7",
+                                action: () {
+                                  setState(() {
+                                    input += "7";
+                                    result = calculator.solve(input) ?? result;
+                                    output = "= " + result;
+                                  });
+                                },
+                              ),
+                              Button(
+                                text: "8",
+                                action: () {
+                                  setState(() {
+                                    input += "8";
+                                    result = calculator.solve(input) ?? result;
+                                    output = "= " + result;
+                                  });
+                                },
+                              ),
+                              Button(
+                                text: "9",
+                                action: () {
+                                  setState(() {
+                                    input += "9";
+                                    result = calculator.solve(input) ?? result;
+                                    output = "= " + result;
+                                  });
+                                },
+                              ),
+                              Button(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: kPrimaryColor,
+                                  size: 25,
                                 ),
-                                Button(
-                                  text: "8",
-                                  action: setText("8"),
-                                ),
-                                Button(
-                                  text: "9",
-                                  action: setText("9"),
-                                ),
-                                Button(
-                                  icon: Icon(
-                                    Icons.clear,
-                                    color: kPrimaryColor,
-                                    size: 25,
-                                  ),
-                                  // color: Color(0xffe5e5e5),
-                                  action: setText("x"),
-                                ),
-                              ],
-                            ),
+                                color: Color(0xFFe9ecef),
+                                action: setText("x"),
+                              ),
+                            ]),
                           ),
                           Expanded(
                             child: Row(
                               children: [
                                 Button(
                                   text: "4",
-                                  action: setText("4"),
+                                  action: () {
+                                    setState(() {
+                                      input += "4";
+                                      result =
+                                          calculator.solve(input) ?? result;
+                                      output = "= " + result;
+                                    });
+                                  },
                                 ),
                                 Button(
                                   text: "5",
-                                  action: setText("5"),
+                                  action: () {
+                                    setState(() {
+                                      input += "5";
+                                      result =
+                                          calculator.solve(input) ?? result;
+                                      output = "= " + result;
+                                    });
+                                  },
                                 ),
                                 Button(
                                   text: "6",
-                                  action: setText("6"),
+                                  action: () {
+                                    setState(() {
+                                      input += "6";
+                                      result =
+                                          calculator.solve(input) ?? result;
+                                      output = "= " + result;
+                                    });
+                                  },
                                 ),
                                 Button(
                                   icon: Icon(
@@ -178,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: kPrimaryColor,
                                     size: 25,
                                   ),
-                                  // color: Color(0xffe5e5e5),
+                                  color: Color(0xFFe9ecef),
                                   action: setText("+"),
                                 ),
                               ],
@@ -189,15 +236,36 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Button(
                                   text: "1",
-                                  action: setText("1"),
+                                  action: () {
+                                    setState(() {
+                                      input += "1";
+                                      result =
+                                          calculator.solve(input) ?? result;
+                                      output = "= " + result;
+                                    });
+                                  },
                                 ),
                                 Button(
                                   text: "2",
-                                  action: setText("2"),
+                                  action: () {
+                                    setState(() {
+                                      input += "2";
+                                      result =
+                                          calculator.solve(input) ?? result;
+                                      output = "= " + result;
+                                    });
+                                  },
                                 ),
                                 Button(
                                   text: "3",
-                                  action: setText("3"),
+                                  action: () {
+                                    setState(() {
+                                      input += "3";
+                                      result =
+                                          calculator.solve(input) ?? result;
+                                      output = "= " + result;
+                                    });
+                                  },
                                 ),
                                 Button(
                                   icon: Icon(
@@ -205,8 +273,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: kPrimaryColor,
                                     size: 25,
                                   ),
-                                  // color: Color(0xffe5e5e5),
-                                  action: setText("−"),
+                                  color: Color(0xFFe9ecef),
+                                  action: setText("-"),
                                 ),
                               ],
                             ),
@@ -223,7 +291,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Button(
                                   text: "0",
-                                  action: setText("0"),
+                                  action: () {
+                                    setState(() {
+                                      input += "0";
+                                      result =
+                                          calculator.solve(input) ?? result;
+                                      output = "= " + result;
+                                    });
+                                  },
                                 ),
                                 Button(
                                   text: ".",
@@ -234,18 +309,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const EdgeInsets.only(top: 5, bottom: 5),
                                   child: RawMaterialButton(
                                     onPressed: () {
-                                      exp = input;
-                                      exp =
-                                          exp.replaceAll(new RegExp(r'x'), '*');
-                                      exp =
-                                          exp.replaceAll(new RegExp(r'÷'), '/');
-                                      exp = exp.replaceAll(
-                                          new RegExp(r'e'), e.toString());
-                                      exp = exp.replaceAll(
-                                          new RegExp(r'π'), pi.toString());
                                       setState(() {
-                                        String result =
-                                            calculator.calculate(exp);
+                                        String result = calculator.solve(input);
                                         output = result == null
                                             ? "ERROR"
                                             : "= " + result;
@@ -302,6 +367,8 @@ class _HomeScreenState extends State<HomeScreen> {
             input = input.substring(0, input.length - 2);
           else if (input.length != 0)
             input = input.substring(0, input.length - 1);
+          result = calculator.solve(input) ?? result;
+          output = "= " + result;
         });
   }
 
@@ -359,6 +426,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             children: [
                               Button(
+                                text: "e",
+                                color: Colors.transparent,
+                                action: setText("e"),
+                              ),
+                              Button(
                                 icon: Icon(
                                   MdiIcons.percentOutline,
                                   color: Colors.white,
@@ -366,11 +438,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 color: Colors.transparent,
                                 action: setText("%"),
-                              ),
-                              Button(
-                                text: "e",
-                                color: Colors.transparent,
-                                action: setText("e"),
                               ),
                               Button(
                                 text: "X!",

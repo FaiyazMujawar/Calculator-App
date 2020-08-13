@@ -53,7 +53,7 @@ class ButtonState extends State<Button> {
         ),
         child: Material(
           borderRadius: BorderRadius.circular(15),
-          color: color ?? Colors.white38,
+          color: color ?? Color(0xfff9f9f9),
           child: InkWell(
             onTap: action,
             onLongPress: lonPressAction,
@@ -65,6 +65,7 @@ class ButtonState extends State<Button> {
                         style: textStyle == null
                             ? TextStyle(
                                 fontSize: 20,
+                                fontFamily: 'Rubik',
                                 color: color == Colors.transparent
                                     ? Colors.white
                                     : Colors.black)
