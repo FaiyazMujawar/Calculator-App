@@ -368,7 +368,10 @@ class _HomeScreenState extends State<HomeScreen> {
           else if (input.length != 0)
             input = input.substring(0, input.length - 1);
           result = calculator.solve(input) ?? result;
-          output = "= " + result;
+          if (input == '')
+            output = '';
+          else
+            output = "= " + result;
         });
   }
 
